@@ -1,0 +1,232 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - Book Store</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Header -->
+    <jsp:include page="header.jsp" />
+
+    <!-- Checkout Section -->
+    <section class="checkout-section py-5">
+        <div class="container">
+            <h1 class="mb-4">Checkout</h1>
+
+            <!-- Error Message Display -->
+            <c:if test="${not empty errorMessage}">
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    ${errorMessage}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            </c:if>
+
+            <!-- Checkout Form -->
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="card mb-4">
+                        <div class="card-header bg-white">
+                            <h5 class="mb-0">Shipping Information</h5>
+                        </div>
+                        <div class="card-body">
+                            <form action="checkout" method="post" class="needs-validation" novalidate>
+
+                                <!-- Shipping Address -->
+                                <div class="mb-4">
+                                    <label for="shippingAddress" class="form-label">Shipping Address</label>
+                                    <textarea class="form-control" id="shippingAddress" name="shippingAddress" rows="3" required>${sessionScope.user.address}</textarea>
+                                    <div class="invalid-feedback">
+                                        Please enter your shipping address.
+                                    </div>
+                                </div>
+
+                                <!-- Payment Method -->
+                                <div class="mb-4">
+                                    <h5 class="mb-3">Payment Method</h5>
+
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="radio" name="paymentMethod" id="creditCard" value="Credit Card" checked>
+                                        <label class="form-check-label" for="creditCard">
+                                            <i class="far fa-credit-card me-2"></i>Credit Card
+                                        </label>
+                                    </div>
+
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="radio" name="paymentMethod" id="paypal" value="PayPal">
+                                        <label class="form-check-label" for="paypal">
+                                            <i class="fab fa-paypal me-2"></i>PayPal
+                                        </label>
+                                    </div>
+
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="radio" name="paymentMethod" id="bankTransfer" value="Bank Transfer">
+                                        <label class="form-check-label" for="bankTransfer">
+                                            <i class="fas fa-university me-2"></i>Bank Transfer
+                                        </label>
+                                    </div>
+
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="paymentMethod" id="cashOnDelivery" value="Cash on Delivery">
+                                        <label class="form-check-label" for="cashOnDelivery">
+                                            <i class="fas fa-money-bill-wave me-2"></i>Cash on Delivery
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- Payment Details (Credit Card Form) -->
+                                <div id="creditCardForm" class="mb-4">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="cardName" class="form-label">Name on Card</label>
+                                            <input type="text" class="form-control" id="cardName" name="cardName" required value="${sessionScope.user.fullName}">
+                                            <div class="invalid-feedback">
+                                                Please enter the name on your card.
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="cardNumber" class="form-label">Card Number</label>
+                                            <input type="text" class="form-control" id="cardNumber" name="cardNumber" placeholder="XXXX XXXX XXXX XXXX" required>
+                                            <div class="invalid-feedback">
+                                                Please enter a valid card number (13–16 digits).
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-4 mb-3">
+                                            <label for="expirationMonth" class="form-label">Expiration Month</label>
+                                            <select class="form-select" id="expirationMonth" name="expirationMonth" required>
+                                                <option value="">Month</option>
+                                                <c:forEach var="i" begin="1" end="12">
+                                                    <c:set var="month" value="${i < 10 ? '0' + i : i}" />
+                                                    <option value="${month}">${month}</option>
+                                                </c:forEach>
+                                            </select>
+                                            <div class="invalid-feedback">
+                                                Please select expiration month.
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label for="expirationYear" class="form-label">Expiration Year</label>
+                                            <select class="form-select" id="expirationYear" name="expirationYear" required>
+                                                <option value="">Year</option>
+                                                <c:forEach var="y" begin="2024" end="2030">
+                                                    <option value="${y}">${y}</option>
+                                                </c:forEach>
+                                            </select>
+                                            <div class="invalid-feedback">
+                                                Please select expiration year.
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label for="cvv" class="form-label">CVV</label>
+                                            <input type="text" class="form-control" id="cvv" name="cvv" placeholder="XXX" pattern="\\d{3,4}" required>
+                                            <div class="invalid-feedback">
+                                                Please enter a valid 3 or 4 digit CVV.
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-text">
+                                        <small class="text-muted">Note: This is a demo application. No actual payment will be processed.</small>
+                                    </div>
+                                </div>
+
+                                <!-- Back and Place Order Buttons -->
+                                <div class="d-flex justify-content-between">
+                                    <a href="cart" class="btn btn-outline-secondary">
+                                        <i class="fas fa-arrow-left me-2"></i>Back to Cart
+                                    </a>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-check me-2"></i>Place Order
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Order Summary -->
+                <div class="col-lg-4">
+                    <div class="card">
+                        <div class="card-header bg-white">
+                            <h5 class="mb-0">Order Summary</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-4">
+                                <h6 class="mb-3">Items in Cart</h6>
+                                <c:forEach items="${cart}" var="item">
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>${item.quantity} × ${item.book.title}</span>
+                                        <span class="fw-bold">$${item.subtotal}</span>
+                                    </div>
+                                </c:forEach>
+                            </div>
+                            <hr>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Subtotal:</span>
+                                <span class="fw-bold">$${total}</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Shipping:</span>
+                                <span>Free</span>
+                            </div>
+                            <div class="d-flex justify-content-between mt-3">
+                                <span class="fw-bold">Total:</span>
+                                <span class="fw-bold fs-5">$${total}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <jsp:include page="footer.jsp" />
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Bootstrap validation
+        (() => {
+            'use strict';
+            const forms = document.querySelectorAll('.needs-validation');
+            Array.from(forms).forEach(form => {
+                form.addEventListener('submit', event => {
+                    if (!form.checkValidity()) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        })();
+
+        // Credit card validation
+        document.getElementById('cardNumber').addEventListener('input', function () {
+            const ccNum = this.value.replace(/\s+/g, '');
+            const isValid = /^[0-9]{13,16}$/.test(ccNum);
+            this.setCustomValidity(isValid ? '' : 'Invalid credit card number');
+        });
+
+        // Show/hide credit card section
+        const creditCardForm = document.getElementById('creditCardForm');
+        document.querySelectorAll('input[name="paymentMethod"]').forEach(radio => {
+            radio.addEventListener('change', function () {
+                if (this.value === 'Credit Card') {
+                    creditCardForm.style.display = 'block';
+                    creditCardForm.querySelectorAll('input, select').forEach(el => el.required = true);
+                } else {
+                    creditCardForm.style.display = 'none';
+                    creditCardForm.querySelectorAll('input, select').forEach(el => el.required = false);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
